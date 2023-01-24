@@ -18,7 +18,7 @@ class Marca extends Model
             'imagem' => [
                 'required',
                 'file',
-                'mimes' => ['png']
+                'mimes:png' 
             ]
         ];
     }
