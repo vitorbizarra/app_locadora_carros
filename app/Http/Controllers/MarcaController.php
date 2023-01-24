@@ -23,7 +23,7 @@ class MarcaController extends Controller
     public function index()
     {
         // return Marca::all();
-        return response()->json($this->marca->all(), 200);
+        return response()->json($this->marca->with('modelos')->get(), 200);
     }
 
     /**
@@ -48,7 +48,7 @@ class MarcaController extends Controller
 
         $imagem = $request->file('imagem');
 
-        $imagem_urn = $imagem->store('imagens', 'public');
+        $imagem_urn = $imagem->store('imagens/marcas', 'public');
 
         $marca = $this->marca->create([
             'nome'   => $request->nome,
@@ -65,7 +65,7 @@ class MarcaController extends Controller
      */
     public function show($id)
     {
-        $marca = $this->marca->find($id);
+        $marca = $this->marca->with('modelos')->find($id);
 
         if ($marca === null) {
             return response()->json(['erro' => 'Recurso pesquisado não existe'], 404);
@@ -116,19 +116,18 @@ class MarcaController extends Controller
         } else if ($request->method() === 'PUT') {
             $request->validate($marca->rules(), $marca->feedback());
         }
-
-        // Remove o arquivo antigo caso um novo arquivo tenha sido enviado no $request
+        
+        $marca->fill($request->all());
         if ($request->file('imagem')) {
+            // Remove o arquivo antigo caso um novo arquivo tenha sido enviado no $request
             Storage::disk('public')->delete($marca->imagem);
+            // Captura e realiza o upload da nova imagem enviada no request
+            $imagem = $request->file('imagem');
+            $imagem_urn = $imagem->store('imagens/marcas', 'public');
+            // Atribui o nome da nova imagem à instância de Modelo
+            $marca->imagem = $imagem_urn;
         }
-
-        $imagem = $request->file('imagem');
-        $imagem_urn = $imagem->store('imagens', 'public');
-
-        $marca->update([
-            'nome'   => $request->nome,
-            'imagem' => $imagem_urn
-        ]);
+        $marca->save();
 
         return response()->json($marca, 200);
     }
