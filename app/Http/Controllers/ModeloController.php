@@ -24,11 +24,16 @@ class ModeloController extends Controller
     {
         $modelos = [];
 
+        $modelos = $this->modelo->with('marca');
+
         if ($request->has('atributos_marca')) {
             $atributos_marca = $request->atributos_marca;
             $modelos = $this->modelo->with('marca:id,' . $atributos_marca);
-        } else {
-            $modelos = $this->modelo->with('marca');
+        }
+
+        if($request->has('filtro')){
+            $condicoes = explode(':', $request->filtro);
+            $modelos = $modelos->where($condicoes[0], $condicoes[1], $condicoes[2]);
         }
 
         if ($request->has('atributos')) {
