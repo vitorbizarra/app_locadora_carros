@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Modelo;
+use App\Repositories\ModeloRepository;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -18,34 +19,28 @@ class ModeloController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
     public function index(Request $request)
     {
-        $modelos = [];
-
-        $modelos = $this->modelo->with('marca');
+        $marcaRepository = new ModeloRepository($this->modelo);
 
         if ($request->has('atributos_marca')) {
-            $atributos_marca = $request->atributos_marca;
-            $modelos = $this->modelo->with('marca:id,' . $atributos_marca);
+            $marcaRepository->selectAtributosRegistrosRelacionados('marca:id,' . $request->atributos_marca);
+        } else {
+            $marcaRepository->selectAtributosRegistrosRelacionados('marca');
         }
 
-        if($request->has('filtro')){
-            $filtros = explode(';', $request->filtro);
-
-            foreach($filtros as $filtro){
-                $condicoes = explode(':', $filtro);
-                $modelos = $modelos->where($condicoes[0], $condicoes[1], $condicoes[2]);
-            }
+        if ($request->has('filtro')) {
+            $marcaRepository->filtro($request->filtro);
         }
 
         if ($request->has('atributos')) {
-            $atributos = $request->atributos;
-            $modelos = $modelos->selectRaw($atributos);
+            $marcaRepository->selectAtributos($request->atributos);
         }
 
-        return response()->json($modelos->get(), 200);
+        return response()->json($marcaRepository->getResultado(), 200);
     }
 
     /**
