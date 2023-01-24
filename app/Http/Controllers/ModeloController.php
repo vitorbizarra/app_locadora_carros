@@ -20,9 +20,23 @@ class ModeloController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json($this->modelo->with('marca')->get(), 200);
+        $modelos = [];
+
+        if ($request->has('atributos_marca')) {
+            $atributos_marca = $request->atributos_marca;
+            $modelos = $this->modelo->with('marca:id,' . $atributos_marca);
+        } else {
+            $modelos = $this->modelo->with('marca');
+        }
+
+        if ($request->has('atributos')) {
+            $atributos = $request->atributos;
+            $modelos = $modelos->selectRaw($atributos);
+        }
+
+        return response()->json($modelos->get(), 200);
     }
 
     /**
@@ -118,7 +132,7 @@ class ModeloController extends Controller
             $request->validate($modelo->rules());
         }
 
-        $modelo->fill($request->all());     
+        $modelo->fill($request->all());
         if ($request->file('imagem')) {
             // Remove o arquivo antigo caso um novo arquivo tenha sido enviado no $request
             Storage::disk('public')->delete($modelo->imagem);
