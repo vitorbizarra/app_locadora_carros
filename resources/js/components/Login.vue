@@ -101,8 +101,9 @@ export default {
       fetch(url, config)
         .then((response) => response.json())
         .then((data) => {
+          console.log(data)
           if (data.access_token) {
-            document.cookie = "token=" + data.access_token;
+            document.cookie = "access_token=" + data.access_token;
           }
           e.target.submit();
         });
