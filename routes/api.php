@@ -26,8 +26,9 @@ Route::middleware('jwt.auth')->prefix('v1')->group(function () {
     Route::apiResource('modelo', \App\Http\Controllers\ModeloController::class);
 
     Route::post('me', [\App\Http\Controllers\AuthController::class, 'me']);
-    Route::post('refresh', [\App\Http\Controllers\AuthController::class, 'refresh']);
     Route::post('logout', [\App\Http\Controllers\AuthController::class, 'logout']);
 });
 
 Route::post('login', [\App\Http\Controllers\AuthController::class, 'login']);
+Route::post('refresh', [\App\Http\Controllers\AuthController::class, 'refresh']);
+
