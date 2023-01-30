@@ -1,6 +1,6 @@
 <template>
-  <div class="card">
-    <div class="card-header">{{ titulo }}</div>
+  <div class="card mb-3">
+    <div class="card-header">.: {{ titulo }}</div>
 
     <div class="card-body">
       <slot name="conteudo"></slot>
