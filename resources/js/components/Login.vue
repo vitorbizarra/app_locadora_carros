@@ -102,8 +102,8 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           console.log(data)
-          if (data.access_token) {
-            document.cookie = "access_token=" + data.access_token;
+          if (data.token) {
+            document.cookie = "token=" + data.token;
           }
           e.target.submit();
         });
